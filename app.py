@@ -5,9 +5,9 @@ import tensorflow as tf
 app = Flask(__name__)
 
 # Load the saved models
-soc_model = tf.keras.models.load_model('tesla_SOC.h5')
-soh_model = tf.keras.models.load_model('SOH.h5')
-range_model = tf.keras.models.load_model('range.h5')
+soc_model = tf.keras.models.load_model(r'C:\Users\USERE\Downloads\tesla_SOC.h5')
+soh_model = tf.keras.models.load_model(r'C:\Users\USERE\Downloads\SOH.h5')
+range_model = tf.keras.models.load_model(r'C:\Users\USERE\Downloads\range.h5')
 
 @app.route('/')
 def index():
@@ -21,6 +21,9 @@ def predict():
     voltage = request.form['voltage']
     current = request.form['current']
     battery_temp = request.form['battery_temp']
+    terminal_voltage = request.form['terminal_voltage']
+    terminal_current = request.form['terminal_current']
+    temperature = request.form['temperature']
     quantity = request.form['quantity']
     city = request.form['city']
     motor_way = request.form['motor_way']
@@ -39,6 +42,9 @@ def predict():
     if voltage and current and battery_temp:
         models_to_predict.append('SOC')
 
+    if terminal_voltage and terminal_current and temperature:
+        models_to_predict.append('SOH')
+
     if quantity and city and motor_way and country_roads and consumption and ac and park_heating and ecr_deviation and tire_type and driving_style_fast and driving_style_moderate and avg_speed:
         models_to_predict.append('Range')
 
@@ -51,6 +57,9 @@ def predict():
         'voltage': [float(voltage)] if voltage else [None],
         'current': [float(current)] if current else [None],
         'battery_temp': [float(battery_temp)] if battery_temp else [None],
+        'terminal_voltage': [float(terminal_voltage)] if terminal_voltage else [None],
+        'terminal_current': [float(terminal_current)] if terminal_current else [None],
+        'temperature': [float(temperature)] if temperature else [None],
         'quantity': [float(quantity)] if quantity else [None],
         'city': [float(city)] if city else [None],
         'motor_way': [float(motor_way)] if motor_way else [None],
@@ -72,8 +81,9 @@ def predict():
     range_prediction = None
     if 'SOC' in models_to_predict:
         soc_prediction = 100 * soc_model.predict(input_df[['voltage', 'current', 'battery_temp']])[0][0]
-        soh_prediction = 100 * soh_model.predict(input_df[['voltage', 'current', 'battery_temp']])[0][0]
         print(soc_prediction)
+    if 'SOH' in models_to_predict:
+        soh_prediction = 100 * soh_model.predict(input_df[['terminal_voltage', 'terminal_current', 'temperature']])[0][0]
         print(soh_prediction)
     if 'Range' in models_to_predict:
         range_prediction = 1*range_model.predict(input_df[['quantity', 'city', 'motor_way', 'country_roads', 'consumption', 'ac', 'park_heating', 'ecr_deviation', 'tire_type', 'driving_style_fast', 'driving_style_moderate', 'avg_speed']])[0][0]

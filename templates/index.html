@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Electric Vehicle Battery Performance Prediction</title>
+        <title>Battery Monitoring System for E-Vehicles</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>
             body {
@@ -36,6 +36,7 @@
                 margin-bottom: 10px;
                 width: 200px;
             }
+            
             .predict-button {
     padding: 10px 20px;
     background-color: #4CAF50;
@@ -46,6 +47,8 @@
     font-size: 16px;
     font-weight: bold;
     transition: background-color 0.3s ease;
+    display: block;
+  margin: 0 auto;
     
 }
 
@@ -77,44 +80,67 @@
     </head>
 <body>
     <header>
-		<h1>Electric Vehicle Battery Performance Prediction</h1>
+		<h1>Battery Monitoring System for E-Vehicles</h1>
 	</header>
     
 	<form method="POST" action="/predict">
         <section>
 		<h2>State of Charge (SOC) Prediction</h2>
 		<label for="voltage">Voltage (V):</label>
-		<input type="number" name="voltage" id="voltage" step="0.01"><br><br>
+		<input type="number" name="voltage" id="voltage" step="0.0001"><br><br>
 		<label for="current">Current (A):</label>
-		<input type="number" name="current" id="current" step="0.01"><br><br>
+		<input type="number" name="current" id="current" step="0.0001"><br><br>
 		<label for="battery_temp">Battery Temperature (°C):</label>
-		<input type="number" name="battery_temp" id="battery_temp" step="0.01"><br><br>
+		<input type="number" name="battery_temp" id="battery_temp" step="0.0001"><br><br>
         <input type="submit" value="Predict" class="predict-button"><br><br>
 
         			<table id="soc_soh_table">
 				<tr>
 					<th>SOC</th>
+				</tr>
+                {% if soc is not none %}
+                <tr>
+                    <td id="soc">{{ soc }} %</td>
+                </tr>
+                {% endif %}
+			</table>
+
+    </section>
+    <section>
+		<h2>State of Health (SOH) Prediction</h2>
+		<label for="voltage">Voltage (V):</label>
+		<input type="number" name="terminal_voltage" id="terminal_voltage" step="0.0001"><br><br>
+		<label for="current">Current (A):</label>
+		<input type="number" name="terminal_current" id="terminal_current" step="0.0001"><br><br>
+		<label for="battery_temp">Battery Temperature (°C):</label>
+		<input type="number" name="temperature" id="temperature" step="0.0001"><br><br>
+        <input type="submit" value="Predict" class="predict-button"><br><br>
+
+        			<table id="soc_soh_table">
+				<tr>
 					<th>SOH</th>
 				</tr>
-				<tr>
-					<td id="soc">{{ soc }}%</td>
-					<td id="soh">{{ soh }}%</td>
-				</tr>
+
+                {% if soh is not none %}
+                <tr>
+                    <td id="soh">{{ soh }} %</td>
+                </tr>
+                {% endif %}
 			</table>
 
     </section>
     <section>
 		<h2>Range Prediction</h2>
         <label for="quantity">Quantity (kWh):</label>
-		<input type="number" name="quantity" id="quantity" step="0.01"><br><br>
+		<input type="number" name="quantity" id="quantity" step="0.0001"><br><br>
 		<label for="city">City Driving (%):</label>
-		<input type="number" name="city" id="city" step="0.01"><br><br>
+		<input type="number" name="city" id="city" step="0.0001"><br><br>
 		<label for="motor_way">Motorway Driving (%):</label>
-		<input type="number" name="motor_way" id="motor_way" step="0.01"><br><br>
+		<input type="number" name="motor_way" id="motor_way" step="0.0001"><br><br>
 		<label for="country_roads">Country Roads Driving (%):</label>
-		<input type="number" name="country_roads" id="country_roads" step="0.01"><br><br>
+		<input type="number" name="country_roads" id="country_roads" step="0.0001"><br><br>
 		<label for="consumption">Consumption (kWh/100km):</label>
-		<input type="number" name="consumption" id="consumption" step="0.01"><br><br>
+		<input type="number" name="consumption" id="consumption" step="0.0001"><br><br>
 		<label for="ac">A/C (On/Off):</label>
 		<select name="ac" id="ac">
 			<option value="1">On</option>
@@ -126,24 +152,18 @@
 			<option value="0">Off</option>
 		</select><br><br>
 		<label for="ecr_deviation">ECR Deviation (%):</label>
-		<input type="number" name="ecr_deviation" id="ecr_deviation" step="0.01"><br><br>
+		<input type="number" name="ecr_deviation" id="ecr_deviation" step="0.0001"><br><br>
 		<label for="tire_type">Tire Type (Winter/Summer):</label>
 		<select name="tire_type" id="tire_type">
 			<option value="1">Winter</option>
 			<option value="0">Summer</option>
 		</select><br><br>
-		<label for="driving_style_fast">Driving Style (Fast/Moderate):</label>
-		<select name="driving_style_fast" id="driving_style_fast">
-			<option value="1">Fast</option>
-			<option value="0">Moderate</option>
-		</select><br><br>
-		<label for="driving_style_moderate">Driving Style (Moderate/Slow):</label>
-		<select name="driving_style_moderate" id="driving_style_moderate">
-			<option value="1">Moderate</option>
-			<option value="0">Slow</option>
-		</select><br><br>
+        <label for="driving_style Fast">driving_style Fast:</label>
+        <input type="number" id="driving_style_fast" name="driving_style_fast"><br><br>
+        <label for="driving_style Moderate">driving_style Moderate:</label>
+        <input type="number" id="driving_style_moderate" name="driving_style_moderate"><br><br>
 		<label for="avg_speed">Average Speed (km/h):</label>
-		<input type="number" name="avg_speed" id="avg_speed" step="0.01"><br><br>
+		<input type="number" name="avg_speed" id="avg_speed" step="0.0001"><br><br>
 
 
         <input type="submit" value="Predict" class="predict-button"><br><br>
@@ -152,9 +172,11 @@
                 <th>Range</th>
              
             </tr>
+            {% if range is not none %}
             <tr>
-                <td id="range">{{ range }}km</td>
+                <td id="range">{{ range }} km</td>
             </tr>
+            {% endif %}
         </table>
 
   
@@ -164,7 +186,6 @@
 	{% if error %}
 		<h2>Error: {{ error }}</h2>
 	{% endif %}
-
 
 </body>
 </html>
