@@ -5,9 +5,9 @@ import tensorflow as tf
 app = Flask(__name__)
 
 # Load the saved models
-soc_model = tf.keras.models.load_model(r'C:\Users\USERE\Downloads\tesla_SOC.h5')
-soh_model = tf.keras.models.load_model(r'C:\Users\USERE\Downloads\SOH.h5')
-range_model = tf.keras.models.load_model(r'C:\Users\USERE\Downloads\range.h5')
+soc_model = tf.keras.models.load_model('tesla_SOC.h5')
+soh_model = tf.keras.models.load_model('SOH.h5')
+range_model = tf.keras.models.load_model('range.h5')
 
 @app.route('/')
 def index():
